@@ -1,14 +1,14 @@
 package edu.univ.erp.domain;
 
-public class GradeComponent {
+public class Grade {
     private int componentId;
     private int courseId;
     private String name;
     private double weight;
 
-    public GradeComponent() {}
+    public Grade() {}
 
-    public GradeComponent(int componentId, int courseId, String name, double weight) {
+    public Grade(int componentId, int courseId, String name, double weight) {
         this.componentId = componentId;
         this.courseId = courseId;
         this.name = name;
