@@ -210,8 +210,8 @@ public class ErpDao {
     // ---------------------------
     // GRADE OPERATIONS
     // ---------------------------
-    public List<GradeComponent> getGradesByEnrollment(int enrollmentId) {
-        List<GradeComponent> list = new ArrayList<>();
+    public List<Grade> getGradesByEnrollment(int enrollmentId) {
+        List<Grade> list = new ArrayList<>();
         String sql = "SELECT * FROM grades WHERE enrollment_id = ?";
         try (Connection conn = DbPool.getErpDataSource().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -219,7 +219,7 @@ public class ErpDao {
             ps.setInt(1, enrollmentId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                GradeComponent g = new GradeComponent();
+                Grade g = new Grade();
                 g.setGradeId(rs.getInt("grade_id"));
                 g.setEnrollmentId(rs.getInt("enrollment_id"));
                 g.setComponent(rs.getString("component"));

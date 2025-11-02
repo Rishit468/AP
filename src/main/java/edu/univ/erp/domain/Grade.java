@@ -1,29 +1,39 @@
 package edu.univ.erp.domain;
 
 public class Grade {
-    private int componentId;
-    private int courseId;
-    private String name;
-    private double weight;
+    private int gradeId;
+    private int enrollmentId;
+    private String component;
+    private double score;
 
     public Grade() {}
 
-    public Grade(int componentId, int courseId, String name, double weight) {
-        this.componentId = componentId;
-        this.courseId = courseId;
-        this.name = name;
-        this.weight = weight;
+    public Grade(int gradeId, int enrollmentId, String component, double score) {
+        this.gradeId = gradeId;
+        this.enrollmentId = enrollmentId;
+        this.component = component;
+        this.score = score;
     }
 
-    public int getComponentId() { return componentId; }
-    public void setComponentId(int componentId) { this.componentId = componentId; }
+    public int getGradeId() { return gradeId; }
+    public void setGradeId(int gradeId) { this.gradeId = gradeId; }
 
-    public int getCourseId() { return courseId; }
-    public void setCourseId(int courseId) { this.courseId = courseId; }
+    public int getEnrollmentId() { return enrollmentId; }
+    public void setEnrollmentId(int enrollmentId) { this.enrollmentId = enrollmentId; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getComponent() { return component; }
+    public void setComponent(String component) { this.component = component; }
 
-    public double getWeight() { return weight; }
-    public void setWeight(double weight) { this.weight = weight; }
+    public double getScore() { return score; }
+    public void setScore(double score) { this.score = score; }
+
+    @Override
+    public String toString() {
+        return "Grade{" +
+                "gradeId=" + gradeId +
+                ", enrollmentId=" + enrollmentId +
+                ", component='" + component + '\'' +
+                ", score=" + score +
+                '}';
+    }
 }

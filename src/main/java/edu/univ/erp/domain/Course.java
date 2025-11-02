@@ -26,4 +26,14 @@ public class Course {
 
     public int getCredits() { return credits; }
     public void setCredits(int credits) { this.credits = credits; }
+
+    @Override
+    public String toString() {
+        return "Course{" +
+                "courseId=" + courseId +
+                ", code='" + code + '\'' +
+                ", title='" + title + '\'' +
+                ", credits=" + credits +
+                '}';
+    }
 }

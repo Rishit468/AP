@@ -4,15 +4,15 @@ public class Enrollment {
     private int enrollmentId;
     private int studentId;
     private int sectionId;
-    private String grade;
+    private String status;
 
     public Enrollment() {}
 
-    public Enrollment(int enrollmentId, int studentId, int sectionId, String grade) {
+    public Enrollment(int enrollmentId, int studentId, int sectionId, String status) {
         this.enrollmentId = enrollmentId;
         this.studentId = studentId;
         this.sectionId = sectionId;
-        this.grade = grade;
+        this.status = status;
     }
 
     public int getEnrollmentId() { return enrollmentId; }
@@ -24,6 +24,16 @@ public class Enrollment {
     public int getSectionId() { return sectionId; }
     public void setSectionId(int sectionId) { this.sectionId = sectionId; }
 
-    public String getGrade() { return grade; }
-    public void setGrade(String grade) { this.grade = grade; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    @Override
+    public String toString() {
+        return "Enrollment{" +
+                "enrollmentId=" + enrollmentId +
+                ", studentId=" + studentId +
+                ", sectionId=" + sectionId +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }
