@@ -5,6 +5,7 @@ public class UserAuth {
     private String username;
     private String role;
     private String status;
+    private String passwordHash; // ✅ newly added, for AuthDao/AuthService internal use only
 
     public UserAuth() {}
 
@@ -27,12 +28,16 @@ public class UserAuth {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
     public boolean isAdmin() { return "ADMIN".equalsIgnoreCase(role); }
     public boolean isInstructor() { return "INSTRUCTOR".equalsIgnoreCase(role); }
     public boolean isStudent() { return "STUDENT".equalsIgnoreCase(role); }
 
     @Override
     public String toString() {
+        // Don’t print password hash for security
         return "UserAuth{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +

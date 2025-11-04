@@ -1,26 +1,69 @@
 package edu.univ.erp.domain;
 
 public class Instructor {
+    private int instructorId;
     private int userId;
+    private String name;
+    private String email;
     private String department;
 
     public Instructor() {}
 
-    public Instructor(int userId, String department) {
+    public Instructor(int instructorId, int userId, String name, String email, String department) {
+        this.instructorId = instructorId;
         this.userId = userId;
+        this.name = name;
+        this.email = email;
         this.department = department;
     }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public int getInstructorId() {
+        return instructorId;
+    }
 
-    public String getDepartment() { return department; }
-    public void setDepartment(String department) { this.department = department; }
+    public void setInstructorId(int instructorId) {
+        this.instructorId = instructorId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
 
     @Override
     public String toString() {
         return "Instructor{" +
-                "userId=" + userId +
+                "instructorId=" + instructorId +
+                ", userId=" + userId +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
                 ", department='" + department + '\'' +
                 '}';
     }
