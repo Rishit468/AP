@@ -3,7 +3,9 @@ package edu.univ.erp.data;
 import edu.univ.erp.domain.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ErpDao {
 
@@ -155,6 +157,8 @@ public class ErpDao {
         return list;
     }
 
+
+
     // ======================================================
     // COURSE OPERATIONS
     // ======================================================
@@ -285,6 +289,56 @@ public class ErpDao {
     // ======================================================
     // ENROLLMENT OPERATIONS
     // ======================================================
+
+    public Map<Integer, Map<String, Double>> getGradesBySection(int sectionId) {
+        Map<Integer, Map<String, Double>> allGrades = new HashMap<>();
+
+        String sql = "SELECT g.enrollment_id, g.component, g.score " +
+                "FROM grades g " +
+                "JOIN enrollments e ON g.enrollment_id = e.enrollment_id " +
+                "WHERE e.section_id = ?";
+
+        try (Connection conn = DbPool.getErpDataSource().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, sectionId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int enrollmentId = rs.getInt("enrollment_id");
+                    String component = rs.getString("component");
+                    double score = rs.getDouble("score");
+
+                    // Get or create the map for this enrollmentId
+                    allGrades.computeIfAbsent(enrollmentId, k -> new HashMap<>())
+                            .put(component, score);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return allGrades;
+    }
+
+    public void upsertGrade(int enrollmentId, String component, Double score) throws SQLException {
+        // Use database-specific syntax for "upsert"
+        // This is for MySQL: INSERT ... ON DUPLICATE KEY UPDATE
+        String sql = "INSERT INTO grades (enrollment_id, component, score) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE score = VALUES(score)";
+
+        try (Connection conn = DbPool.getErpDataSource().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, enrollmentId);
+            ps.setString(2, component);
+            if (score == null) {
+                ps.setNull(3, Types.DOUBLE);
+            } else {
+                ps.setDouble(3, score);
+            }
+
+            ps.executeUpdate();
+        }
+        // Let SQLException propagate
+    }
     public List<Enrollment> getEnrollmentsByStudent(int studentId) {
         List<Enrollment> list = new ArrayList<>();
         String sql = "SELECT e.enrollment_id, e.section_id, e.status, " +
@@ -367,7 +421,7 @@ public class ErpDao {
         String sql = """
             SELECT e.*, st.roll_no, u.username AS student_name
             FROM enrollments e
-            JOIN students st ON e.student_id = st.student_id
+            JOIN students st ON e.student_id = st.user_id
             JOIN auth_db.users u ON st.user_id = u.user_id
             WHERE e.section_id = ?
         """;
