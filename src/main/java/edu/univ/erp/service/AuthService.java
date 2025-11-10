@@ -12,8 +12,18 @@ public class AuthService {
      * Authenticates user by verifying credentials.
      */
     public UserAuth authenticate(String username, String plainPassword) {
+        // --- ⬇️ DEBUGGING LINES ⬇️ ---
+        System.out.println("DEBUG: Attempting login for: " + username);
         UserAuth user = authDao.getUserByUsername(username);
-        if (user == null) return null;
+
+        if (user == null) {
+            System.out.println("DEBUG: User not found in database.");
+            return null;
+        }
+
+        System.out.println("DEBUG: Hash from DB: " + user.getPasswordHash());
+        System.out.println("DEBUG: Plain pass: " + plainPassword);
+        // --- ⬆️ END DEBUGGING ⬆️ ---
 
         if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
             System.out.println("User is inactive or locked.");
@@ -21,13 +31,19 @@ public class AuthService {
         }
 
         boolean match = PasswordUtil.verifyPassword(plainPassword, user.getPasswordHash());
+
+        // --- ⬇️ DEBUGGING LINES ⬇️ ---
+        System.out.println("DEBUG: Password match result: " + match);
+        // --- ⬆️ END DEBUGGING ⬆️ ---
+
         return match ? user : null;
     }
+
 
     /**
      * Creates a new user account.
      */
-    public boolean register(String username, String plainPassword, String role) {
+    public UserAuth register(String username, String plainPassword, String role) {
         String hashed = PasswordUtil.hashPassword(plainPassword);
         return authDao.createUser(username, hashed, role);
     }
