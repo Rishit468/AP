@@ -1,6 +1,8 @@
 package edu.univ.erp.UI;
 
-import edu.univ.erp.data.AuthDao;
+// REMOVED: import edu.univ.erp.data.AuthDao;
+import edu.univ.erp.service.AdminService;
+import edu.univ.erp.service.AuthService; // ADDED
 import edu.univ.erp.domain.UserAuth;
 
 import javax.swing.*;
@@ -12,6 +14,9 @@ public class LoginFrame extends JFrame {
     private JPasswordField passwordField;
     private JButton loginButton;
     private JLabel statusLabel;
+
+    // --- SERVICE LAYER ---
+    private final AuthService authService = new AuthService(); // ADDED
 
     public LoginFrame() {
         setTitle("University ERP - Login");
@@ -45,8 +50,16 @@ public class LoginFrame extends JFrame {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
 
-        AuthDao authDao = new AuthDao();
-        UserAuth user = authDao.authenticate(username, password);
+        // -------------------------------------------------
+        // ❌ MISTAKE: You were calling AuthDao here.
+        // AuthDao authDao = new AuthDao();
+        // UserAuth user = authDao.authenticate(username, password);
+        // -------------------------------------------------
+
+        // ✅ CORRECT: Call the AuthService
+        UserAuth user = authService.authenticate(username, password);
+        // -------------------------------------------------
+
 
         if (user != null) {
             statusLabel.setText("✅ Welcome, " + user.getUsername() + " (" + user.getRole() + ")");
@@ -72,6 +85,11 @@ public class LoginFrame extends JFrame {
     }
 
     public static void main(String[] args) {
+        System.out.println("Application starting up...");
+        AdminService adminService = new AdminService();
+        adminService.loadInitialSettings();
+        // Here you would also initialize settings
+        // e.g., AdminService.loadInitialSettings();
         SwingUtilities.invokeLater(() -> {
             LoginFrame frame = new LoginFrame();
             frame.setVisible(true);
