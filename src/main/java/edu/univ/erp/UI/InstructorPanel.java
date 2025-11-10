@@ -1,6 +1,7 @@
 package edu.univ.erp.UI;
 
-import edu.univ.erp.data.ErpDao;
+// REMOVED: import edu.univ.erp.data.ErpDao;
+import edu.univ.erp.service.InstructorService; // ADDED
 import edu.univ.erp.domain.*;
 
 import javax.swing.*;
@@ -10,7 +11,12 @@ import java.util.List;
 
 public class InstructorPanel extends JPanel {
 
-    private final ErpDao erpDao = new ErpDao();
+    // -------------------------------------------------
+    // ❌ MISTAKE: private final ErpDao erpDao = new ErpDao();
+    // ✅ CORRECT:
+    private final InstructorService instructorService = new InstructorService();
+    // -------------------------------------------------
+
     private final UserAuth user;
 
     public InstructorPanel(UserAuth user) {
@@ -18,7 +24,8 @@ public class InstructorPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        Instructor instructor = erpDao.getInstructorByUserId(user.getUserId());
+        // Use the service
+        Instructor instructor = instructorService.getInstructorProfile(user.getUserId());
         if (instructor == null) {
             add(new JLabel("Instructor record not found."), BorderLayout.CENTER);
             return;
@@ -31,8 +38,8 @@ public class InstructorPanel extends JPanel {
 
         add(infoPanel, BorderLayout.NORTH);
 
-        // Sections taught by instructor
-        List<Section> sections = erpDao.getSectionsByInstructor(instructor.getInstructorId());
+        // Sections taught by instructor - use the service
+        List<Section> sections = instructorService.getSectionsByInstructor(instructor.getInstructorId());
         String[] secCols = {"Section ID", "Course ID", "Day/Time", "Room", "Semester", "Year"};
         DefaultTableModel secModel = new DefaultTableModel(secCols, 0);
         for (Section s : sections)
@@ -51,10 +58,10 @@ public class InstructorPanel extends JPanel {
         centerPanel.add(new JScrollPane(secTable), BorderLayout.CENTER);
         add(centerPanel, BorderLayout.CENTER);
 
-        // Students in first section (optional demo)
+        // Students in first section (optional demo) - use the service
         if (!sections.isEmpty()) {
             int sectionId = sections.get(0).getSectionId();
-            List<Enrollment> enrollments = erpDao.getEnrollmentsBySection(sectionId);
+            List<Enrollment> enrollments = instructorService.getEnrollmentsBySection(sectionId);
 
             String[] enrollCols = {"Enrollment ID", "Student ID", "Status"};
             DefaultTableModel enrollModel = new DefaultTableModel(enrollCols, 0);
