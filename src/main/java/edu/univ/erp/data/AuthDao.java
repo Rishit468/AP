@@ -3,6 +3,8 @@ package edu.univ.erp.data;
 import edu.univ.erp.domain.UserAuth;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuthDao {
 
@@ -22,7 +24,8 @@ public class AuthDao {
                 UserAuth user = new UserAuth();
                 user.setUserId(rs.getInt("user_id"));
                 user.setUsername(rs.getString("username"));
-                user.setPasswordHash(rs.getString("pass_hash"));
+                String hashFromDb = rs.getString("pass_hash");
+                user.setPasswordHash(hashFromDb != null ? hashFromDb.trim() : null);
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
                 return user;
@@ -62,20 +65,34 @@ public class AuthDao {
     /**
      * (Optional) Create new user account.
      */
-    public boolean createUser(String username, String hashedPassword, String role) {
+    public UserAuth createUser(String username, String hashedPassword, String role) {
         String sql = "INSERT INTO users (username, pass_hash, role, status) VALUES (?, ?, ?, 'ACTIVE')";
+
+        // Use RETURN_GENERATED_KEYS to get the new user_id
         try (Connection conn = DbPool.getAuthDataSource().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, username);
             ps.setString(2, hashedPassword);
             ps.setString(3, role);
-            return ps.executeUpdate() == 1;
+
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected == 1) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int newUserId = rs.getInt(1);
+                        // Return the complete object
+                        return new UserAuth(newUserId, username, role, "ACTIVE");
+                    }
+                }
+            }
         } catch (SQLException e) {
             System.err.println("Error creating user: " + e.getMessage());
         }
-        return false;
+        return null; // Return null on failure
     }
+
 
     /**
      * (Optional) Update account status (e.g., deactivate or lock).
@@ -92,5 +109,29 @@ public class AuthDao {
             System.err.println("Error updating user status: " + e.getMessage());
         }
         return false;
+    }
+
+    public List<UserAuth> getAllUsers() {
+        List<UserAuth> users = new ArrayList<>();
+        // Note: We specifically exclude the 'pass_hash' column
+        String sql = "SELECT user_id, username, role, status FROM users ORDER BY user_id";
+
+        try (Connection conn = DbPool.getAuthDataSource().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                UserAuth user = new UserAuth();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setRole(rs.getString("role"));
+                user.setStatus(rs.getString("status"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching all users: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return users;
     }
 }
